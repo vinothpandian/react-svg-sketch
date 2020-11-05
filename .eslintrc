@@ -1,0 +1,45 @@
+{
+  "env": {
+    "browser": true,
+    "jest": true,
+    "node": true,
+    "serviceworker": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:jest/recommended"
+  ],
+  "globals": {
+    "console": "readonly",
+    "document": "readonly",
+    "fetch": "readonly",
+    "module": "writable",
+    "window": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "plugins": ["prettier", "@typescript-eslint", "import", "jest"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx",
+          ".json",
+          ".es6",
+          ".mjs",
+          ".cjs"
+        ]
+      }
+    },
+    // Always ignore typescript as it adds about 90 seconds to the runtime of the import plugin
+    "import/ignore": ["typescript"]
+  }
+}

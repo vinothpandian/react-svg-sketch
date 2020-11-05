@@ -1,8 +1,7 @@
-import React from "react";
-
 import { produce } from "immer";
+import React from "react";
 import { Canvas } from "./Canvas";
-import { Point, CanvasPath, ExportImageType } from "./typings";
+import { CanvasPath, ExportImageType, Point } from "./typings";
 
 /* Default settings */
 

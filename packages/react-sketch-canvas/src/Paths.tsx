@@ -1,5 +1,5 @@
 import React from "react";
-import { Point, CanvasPath } from "./typings";
+import { CanvasPath, Point } from "./typings";
 
 const svgPath = (
   paths: Point[],
@@ -26,7 +26,7 @@ const svgPath = (
   );
 };
 
-const line = (pointA: Point, pointB: Point) => {
+export const line = (pointA: Point, pointB: Point) => {
   const lengthX = pointB.x - pointA.x;
   const lengthY = pointB.y - pointA.y;
 

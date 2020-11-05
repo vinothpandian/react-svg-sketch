@@ -1,7 +1,7 @@
-import React from "react";
-import { ExportImageType, Point, CanvasPath } from "./typings";
-import Paths from "./Paths";
 import "pepjs";
+import React from "react";
+import Paths from "./Paths";
+import { CanvasPath, ExportImageType, Point } from "./typings";
 
 /* Default settings */
 

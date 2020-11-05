@@ -1,15 +1,27 @@
 {
   "name": "react-sketch-canvas-monorepo",
-  "version": "1.0.0",
-  "main": "index.js",
   "author": "Vinoth Pandian",
   "license": "MIT",
   "private": true,
   "workspaces": [
     "packages/*",
-    "documentation"
+    "demo/*"
   ],
-  "scripts": {
-    "start": "lerna run start --parallel"
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "prettier": "^2.1.2",
+    "pretty-quick": "^3.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
