@@ -1,15 +1,17 @@
-import 'pepjs';
 import React from 'react';
-import Paths from './Paths';
-import { CanvasPath, ExportImageType, Point } from './typings';
+import Paths from '../Paths';
+import { ExportImageType, Point } from '../typings';
+import { CanvasProps } from './typings';
+import { setViewBoxOnCanvas } from './utils';
 
-/* Default settings */
-
-const defaultProps = {
+/**
+ * Default props for Canvas
+ */
+export const defaultProps: Partial<CanvasProps> = {
   width: '100%',
   height: '100%',
   className: '',
-  canvasColor: 'red',
+  canvasColor: 'white',
   background: '',
   allowOnlyPointerType: 'all',
   style: {
@@ -19,36 +21,12 @@ const defaultProps = {
   withTimeStamp: true,
 };
 
-function getCanvasWithViewBox(canvas: HTMLDivElement) {
-  const svgCanvas = canvas.firstChild?.cloneNode(true) as SVGElement;
-
-  const width = canvas.offsetWidth;
-  const height = canvas.offsetHeight;
-
-  svgCanvas.setAttribute('viewBox', `0 0 ${width} ${height}`);
-
-  svgCanvas.setAttribute('width', width.toString());
-  svgCanvas.setAttribute('height', height.toString());
-  return { svgCanvas, width, height };
-}
-
-/* Props validation */
-
-export type CanvasProps = {
-  paths: CanvasPath[];
-  isDrawing: boolean;
-  className: string;
-  onPointerDown: (point: Point) => void;
-  onPointerMove: (point: Point) => void;
-  onPointerUp: () => void;
-  width: string;
-  height: string;
-  canvasColor: string;
-  background: string;
-  allowOnlyPointerType: string;
-  style: React.CSSProperties;
-};
-
+/**
+ * React Sketch Canvas's Canvas class
+ *
+ * This provides the base SVG element wrapped by a div element.
+ * The div element handles the pointer events, and adds utility import and export functions
+ */
 export class Canvas extends React.Component<CanvasProps> {
   canvas: React.RefObject<HTMLDivElement>;
 
@@ -67,8 +45,8 @@ export class Canvas extends React.Component<CanvasProps> {
     this.canvas = React.createRef<HTMLDivElement>();
   }
 
-  /* Add event listener to Mouse up and Touch up to
-  release drawing even when point goes out of canvas */
+  // Handle pointer up event outside canvas element.
+  // Allows users to drag the sketch line outside canvas and return back to canvas without losing data
   componentDidMount(): void {
     document.addEventListener('pointerup', this.handlePointerUp);
   }
@@ -77,7 +55,11 @@ export class Canvas extends React.Component<CanvasProps> {
     document.removeEventListener('pointerup', this.handlePointerUp);
   }
 
-  // Converts mouse coordinates to relative coordinate based on the absolute position of svg
+  /**
+   * Get coordinate of the pointer relative respective to the canvas and scroll position
+   *
+   * @param event React Pointer Event
+   */
   getCoordinates(pointerEvent: React.PointerEvent<HTMLDivElement>): Point {
     const boundingArea = this.canvas.current?.getBoundingClientRect();
 
@@ -96,16 +78,16 @@ export class Canvas extends React.Component<CanvasProps> {
     return point;
   }
 
-  /* Mouse Handlers - Mouse down, move and up */
-
+  /**
+   * Handle mouse down event after verifying whether pointer type is allowed
+   * This function calls onPointerDown prop with a point
+   *
+   * @param event React Pointer event
+   */
   handlePointerDown(event: React.PointerEvent<HTMLDivElement>): void {
     // Allow only chosen pointer type
-
     const { allowOnlyPointerType, onPointerDown } = this.props;
-    if (
-      allowOnlyPointerType !== 'all' &&
-      event.pointerType !== allowOnlyPointerType
-    ) {
+    if (allowOnlyPointerType !== 'all' && event.pointerType !== allowOnlyPointerType) {
       return;
     }
 
@@ -116,16 +98,19 @@ export class Canvas extends React.Component<CanvasProps> {
     onPointerDown(point);
   }
 
+  /**
+   * Handle mouse move event after verifying whether pointer type is allowed
+   * This function calls onPointerMove prop with a point
+   *
+   * @param event React Pointer event
+   */
   handlePointerMove(event: React.PointerEvent<HTMLDivElement>): void {
     const { isDrawing, allowOnlyPointerType, onPointerMove } = this.props;
 
     if (!isDrawing) return;
 
     // Allow only chosen pointer type
-    if (
-      allowOnlyPointerType !== 'all' &&
-      event.pointerType !== allowOnlyPointerType
-    ) {
+    if (allowOnlyPointerType !== 'all' && event.pointerType !== allowOnlyPointerType) {
       return;
     }
 
@@ -134,17 +119,18 @@ export class Canvas extends React.Component<CanvasProps> {
     onPointerMove(point);
   }
 
-  handlePointerUp(
-    event: React.PointerEvent<HTMLDivElement> | PointerEvent
-  ): void {
+  /**
+   * Handle mouse up event after verifying whether pointer type is allowed
+   * This function calls onPointerUp prop
+   *
+   * @param event React Pointer event
+   */
+  handlePointerUp(event: React.PointerEvent<HTMLDivElement> | PointerEvent): void {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
 
     // Allow only chosen pointer type
     const { allowOnlyPointerType, onPointerUp } = this.props;
-    if (
-      allowOnlyPointerType !== 'all' &&
-      event.pointerType !== allowOnlyPointerType
-    ) {
+    if (allowOnlyPointerType !== 'all' && event.pointerType !== allowOnlyPointerType) {
       return;
     }
 
@@ -153,9 +139,13 @@ export class Canvas extends React.Component<CanvasProps> {
 
   /* Mouse Handlers ends */
 
-  // Creates a image from SVG and renders it on canvas, then exports the canvas as image
+  /**
+   * Export sketch as an image of given image type
+   *
+   * @param imageType Image type to export. JPEG or PNG
+   */
   exportImage(imageType: ExportImageType): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<string>(async (resolve, reject) => {
       try {
         const canvas = this.canvas.current;
 
@@ -164,7 +154,7 @@ export class Canvas extends React.Component<CanvasProps> {
         }
 
         const img = document.createElement('img');
-        const { svgCanvas, width, height } = getCanvasWithViewBox(canvas);
+        const { svgCanvas, width, height } = setViewBoxOnCanvas(canvas);
 
         img.src = `data:image/svg+xml;base64,${btoa(svgCanvas.outerHTML)}`;
 
@@ -188,17 +178,20 @@ export class Canvas extends React.Component<CanvasProps> {
     });
   }
 
+  /**
+   * Export sketch on the canvas as SVG
+   */
   exportSvg(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       try {
-        const canvas = this.canvas?.current ?? null;
+        const canvas = this.canvas.current ?? null;
 
-        if (canvas !== null) {
-          const { svgCanvas } = getCanvasWithViewBox(canvas);
-          resolve(svgCanvas.outerHTML);
+        if (canvas === null) {
+          throw new Error('Canvas not rendered yet');
         }
 
-        reject(new Error('Canvas not loaded'));
+        const { svgCanvas } = setViewBoxOnCanvas(canvas);
+        resolve(svgCanvas.outerHTML);
       } catch (e) {
         reject(e);
       }
@@ -206,17 +199,8 @@ export class Canvas extends React.Component<CanvasProps> {
   }
 
   /* Finally!!! Render method */
-
   render(): JSX.Element {
-    const {
-      width,
-      height,
-      className,
-      canvasColor,
-      background,
-      style,
-      paths,
-    } = this.props;
+    const { width, height, className, canvasColor, background, style, paths } = this.props;
 
     return (
       <div
@@ -224,10 +208,10 @@ export class Canvas extends React.Component<CanvasProps> {
         ref={this.canvas}
         className={className}
         style={{
+          ...style,
           touchAction: 'none',
           width,
           height,
-          ...style,
         }}
         touch-action="none"
         onPointerDown={this.handlePointerDown}

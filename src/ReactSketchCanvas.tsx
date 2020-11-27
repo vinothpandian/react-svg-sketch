@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import React from 'react';
 import { Canvas } from './Canvas';
-import { CanvasPath, ExportImageType, Point } from './typings';
+import { ExportImageType, Point, ReactSketchCanvasPath } from './typings';
 
 /* Default settings */
 
@@ -20,7 +20,7 @@ const defaultProps = {
     borderRadius: '0.25rem',
   },
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onUpdate: (_: CanvasPath[]): void => {},
+  onUpdate: (_: ReactSketchCanvasPath[]): void => {},
   withTimestamp: false,
 };
 
@@ -36,7 +36,7 @@ export type ReactSketchCanvasProps = {
   strokeWidth: number;
   eraserWidth: number;
   allowOnlyPointerType: string;
-  onUpdate: (updatedPaths: CanvasPath[]) => void;
+  onUpdate: (updatedPaths: ReactSketchCanvasPath[]) => void;
   style: React.CSSProperties;
   withTimestamp: boolean;
 };
@@ -44,15 +44,12 @@ export type ReactSketchCanvasProps = {
 export type ReactSketchCanvasStates = {
   drawMode: boolean;
   isDrawing: boolean;
-  resetStack: CanvasPath[];
-  undoStack: CanvasPath[];
-  currentPaths: CanvasPath[];
+  resetStack: ReactSketchCanvasPath[];
+  undoStack: ReactSketchCanvasPath[];
+  currentPaths: ReactSketchCanvasPath[];
 };
 
-export class ReactSketchCanvas extends React.Component<
-  ReactSketchCanvasProps,
-  ReactSketchCanvasStates
-> {
+export class ReactSketchCanvas extends React.Component<ReactSketchCanvasProps, ReactSketchCanvasStates> {
   static defaultProps = defaultProps;
 
   svgCanvas: React.RefObject<Canvas>;
@@ -102,15 +99,12 @@ export class ReactSketchCanvas extends React.Component<
       }
 
       try {
-        const sketchingTime = currentPaths.reduce(
-          (totalSketchingTime, path) => {
-            const startTimestamp = path.startTimestamp ?? 0;
-            const endTimestamp = path.endTimestamp ?? 0;
+        const sketchingTime = currentPaths.reduce((totalSketchingTime, path) => {
+          const startTimestamp = path.startTimestamp ?? 0;
+          const endTimestamp = path.endTimestamp ?? 0;
 
-            return totalSketchingTime + (endTimestamp - startTimestamp);
-          },
-          0
-        );
+          return totalSketchingTime + (endTimestamp - startTimestamp);
+        }, 0);
 
         resolve(sketchingTime);
       } catch (e) {
@@ -133,20 +127,14 @@ export class ReactSketchCanvas extends React.Component<
   /* Mouse Handlers - Mouse down, move and up */
 
   handlePointerDown(point: Point): void {
-    const {
-      strokeColor,
-      strokeWidth,
-      canvasColor,
-      eraserWidth,
-      withTimestamp,
-    } = this.props;
+    const { strokeColor, strokeWidth, canvasColor, eraserWidth, withTimestamp } = this.props;
 
     this.setState(
       produce((draft: ReactSketchCanvasStates) => {
         draft.isDrawing = true;
         draft.undoStack = [];
 
-        let stroke: CanvasPath = {
+        let stroke: ReactSketchCanvasPath = {
           drawMode: draft.drawMode,
           strokeColor: draft.drawMode ? strokeColor : canvasColor,
           strokeWidth: draft.drawMode ? strokeWidth : eraserWidth,
@@ -198,7 +186,7 @@ export class ReactSketchCanvas extends React.Component<
           return;
         }
 
-        let currentStroke: CanvasPath | undefined = draft.currentPaths.pop();
+        let currentStroke: ReactSketchCanvasPath | undefined = draft.currentPaths.pop();
 
         if (currentStroke) {
           currentStroke = {
@@ -318,10 +306,10 @@ export class ReactSketchCanvas extends React.Component<
     });
   }
 
-  exportPaths(): Promise<CanvasPath[]> {
+  exportPaths(): Promise<ReactSketchCanvasPath[]> {
     const { currentPaths } = this.state;
 
-    return new Promise<CanvasPath[]>((resolve, reject) => {
+    return new Promise<ReactSketchCanvasPath[]>((resolve, reject) => {
       try {
         resolve(currentPaths);
       } catch (e) {
@@ -330,7 +318,7 @@ export class ReactSketchCanvas extends React.Component<
     });
   }
 
-  loadPaths(paths: CanvasPath[]): void {
+  loadPaths(paths: ReactSketchCanvasPath[]): void {
     this.setState(
       produce((draft: ReactSketchCanvasStates) => {
         draft.currentPaths = draft.currentPaths.concat(paths);
@@ -342,15 +330,7 @@ export class ReactSketchCanvas extends React.Component<
   /* Finally!!! Render method */
 
   render(): JSX.Element {
-    const {
-      width,
-      height,
-      className,
-      canvasColor,
-      background,
-      style,
-      allowOnlyPointerType,
-    } = this.props;
+    const { width, height, className, canvasColor, background, style, allowOnlyPointerType } = this.props;
 
     const { currentPaths, isDrawing } = this.state;
 

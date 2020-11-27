@@ -1,5 +1,5 @@
 import React from 'react';
-import { CanvasPath, Point } from './typings';
+import { Point, ReactSketchCanvasPath } from './typings';
 
 const svgPath = (
   paths: Point[],
@@ -9,21 +9,11 @@ const svgPath = (
   command: (point: Point, i: number, a: Point[]) => string
 ): JSX.Element => {
   const d = paths.reduce(
-    (acc, point, i, a) =>
-      i === 0 ? `M ${point.x},${point.y}` : `${acc} ${command(point, i, a)}`,
+    (acc, point, i, a) => (i === 0 ? `M ${point.x},${point.y}` : `${acc} ${command(point, i, a)}`),
     ''
   );
 
-  return (
-    <path
-      key={id}
-      d={d}
-      fill="none"
-      strokeLinecap="round"
-      stroke={strokeColor}
-      strokeWidth={strokeWidth}
-    />
-  );
+  return <path key={id} d={d} fill="none" strokeLinecap="round" stroke={strokeColor} strokeWidth={strokeWidth} />;
 };
 
 export const line = (pointA: Point, pointB: Point) => {
@@ -98,19 +88,13 @@ const bezierCommand = (point: Point, i: number, a: Point[]): string => {
 };
 
 type PathProps = {
-  paths: CanvasPath[];
+  paths: ReactSketchCanvasPath[];
 };
 
 const Paths = ({ paths }: PathProps): JSX.Element => (
   <React.Fragment>
-    {paths.map((path: CanvasPath, id: number) =>
-      svgPath(
-        path.paths,
-        id.toString(),
-        path.strokeWidth,
-        path.strokeColor,
-        bezierCommand
-      )
+    {paths.map((path: ReactSketchCanvasPath, id: number) =>
+      svgPath(path.paths, id.toString(), path.strokeWidth, path.strokeColor, bezierCommand)
     )}
   </React.Fragment>
 );

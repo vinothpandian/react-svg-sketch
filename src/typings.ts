@@ -5,7 +5,7 @@ export interface Point {
   readonly y: number;
 }
 
-export interface CanvasPath {
+export interface ReactSketchCanvasPath {
   readonly paths: Point[];
   readonly strokeWidth: number;
   readonly strokeColor: string;
