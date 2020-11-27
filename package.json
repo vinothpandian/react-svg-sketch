@@ -43,7 +43,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "pretty-quick --staged"
     }
   },
   "module": "dist/react-sketch-canvas.esm.js",
@@ -70,6 +70,8 @@
     "@types/react-dom": "^17.0.0",
     "babel-loader": "^8.2.2",
     "husky": "^4.3.0",
+    "prettier": "^2.2.0",
+    "pretty-quick": "^3.1.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
