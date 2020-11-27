@@ -1,25 +1,41 @@
-## Prerequisites
+# Contributing to React-Sketch-Canvas
 
-[Node.js](http://nodejs.org/) >= v4 must be installed.
+This project uses [TSDX](https://github.com/formium/tsdx) for development.
 
 ## Installation
 
-- Running `npm install` in the component's root directory will install everything you need for development.
+- Running `yarn install` in the component's root directory will install everything you need for development.
 
-## Demo Development Server
+## Commands
 
-- `npm start` will run a development server with the component's demo app at [http://localhost:3000](http://localhost:3000) with hot module reloading.
+The core of the `react-sketch-canvas` library is inside `/src`, and demo stories are in `/stories`.
 
-## Running Tests
+The recommended workflow is copied below as explained by TSDX.
 
-- `npm test` will run the tests once.
+In one terminal, run:
 
-- `npm run test:coverage` will run the tests and produce a coverage report in `coverage/`.
+```bash
+yarn start
+```
 
-- `npm run test:watch` will run the tests on every change.
+This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
 
-## Building
+Then run Storybook:
 
-- `npm run build` will build the component for publishing to npm and also bundle the demo app.
+### Storybook
 
-- `npm run clean` will delete built resources.
+Run inside another terminal:
+
+```bash
+yarn storybook
+```
+
+This loads the stories from `./stories`.
+
+## Configuration
+
+Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
+
+### Jest
+
+Jest tests are set up to run with `yarn test`.

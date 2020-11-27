@@ -21,7 +21,7 @@
 
 ### Requirements
 
-- **<span style="color:red">**Requires React 16.4**</span>**
+- **<span style="color:red">**Requires >= React 16.4**</span>**
 - **Depends on [Immer] and [pepjs]**
 
 ### Wanna test React Sketch Canvas before using it?
@@ -47,12 +47,12 @@ yarn add react-sketch-canvas
 Common usage example
 
 ```javascript
-import React from "react";
-import { ReactSketchCanvas } from "react-sketch-canvas";
+import React from 'react';
+import { ReactSketchCanvas } from 'react-sketch-canvas';
 
 const styles = {
-  border: "0.0625rem solid #9c9c9c",
-  borderRadius: "0.25rem",
+  border: '0.0625rem solid #9c9c9c',
+  borderRadius: '0.25rem',
 };
 
 const Canvas = () => {
@@ -156,7 +156,7 @@ Example
 ```javascript
 <ReactSketchCanvas
   style={{
-    border: "0.0625rem solid #9c9c9c",
+    border: '0.0625rem solid #9c9c9c',
   }}
 />
 ```
@@ -183,7 +183,7 @@ _Use ref to access the element and call the following functions to export image_
 ## Types
 
 ```ts
-type ExportImageType = "jpeg" | "png";
+type ExportImageType = 'jpeg' | 'png';
 
 interface Point {
   x: number;
